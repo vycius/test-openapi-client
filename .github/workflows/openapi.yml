@@ -54,6 +54,5 @@ jobs:
 
       - name: Publish client library
         run: npm publish
-        working-directory: typescript-fetch-client
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
