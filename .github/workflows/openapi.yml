@@ -1,0 +1,49 @@
+name: OpenAPI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions: read-all
+
+jobs:
+  generate-library:
+    name: Generate library
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Generate Angular Client
+        uses: openapi-generators/openapitools-generator-action@v1
+        with:
+          generator: typescript-fetch
+          generator-tag: v6.6.0
+          openapi-url: https://petstore3.swagger.io/api/v3/openapi.json
+          config-file: openapi-config.yaml
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: biip-tools-client
+          path: typescript-fetch-client
+
+#      - uses: actions/setup-node@v3
+#        with:
+#          node-version: '18.x'
+#          registry-url: 'https://npm.pkg.github.com'
+#          # Defaults to the user or organization that owns the workflow file
+#          scope: '@aplinkosministerija'
+      - run: npm ci
+        working-directory: typescript-fetch-client
+
+
+      - name: Publish client library
+        run: npm publish
+        working-directory: typescript-fetch-client
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
