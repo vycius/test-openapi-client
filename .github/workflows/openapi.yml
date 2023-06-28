@@ -52,8 +52,6 @@ jobs:
           scope: '@vycius'
       - run: ls -la
 
-      - run: npm ci
-
       - name: Publish client library
         run: npm publish
         working-directory: typescript-fetch-client
