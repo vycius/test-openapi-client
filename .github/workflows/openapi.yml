@@ -11,9 +11,7 @@ jobs:
   generate-library:
     name: Generate library
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+    permissions: read-all
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -32,15 +30,29 @@ jobs:
           name: biip-tools-client
           path: typescript-fetch-client
 
-#      - uses: actions/setup-node@v3
-#        with:
-#          node-version: '18.x'
-#          registry-url: 'https://npm.pkg.github.com'
-#          # Defaults to the user or organization that owns the workflow file
-#          scope: '@aplinkosministerija'
-      - run: npm ci
-        working-directory: typescript-fetch-client
+  publish-library:
+    name: Publish library
+    runs-on: ubuntu-latest
+    needs: [ generate-library ]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Download client
+        uses: actions/download-artifact@v3
+        with:
+          name: biip-tools-client
+      - run: ls -la
 
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          registry-url: 'https://npm.pkg.github.com'
+          # Defaults to the user or organization that owns the workflow file
+          scope: '@vycius'
+      - run: ls -la
+
+      - run: npm ci
 
       - name: Publish client library
         run: npm publish
